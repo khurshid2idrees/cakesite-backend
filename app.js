@@ -10,6 +10,7 @@ const app = express();
 
 // Middleware
 app.use(cors());
+app.use(express.json())
 app.use(bodyParser.json());
 
 
@@ -17,11 +18,11 @@ app.use(bodyParser.json());
 
 ConnectDatabase();
 
-// // Import Routes
-// const authRoutes = require("./routes/authRoutes");
-// const productRoutes = require("./routes/productRoutes");
+ // Import Routes
+const authRoutes = require("./routes/authRoute");
 
-// app.use("/api/auth", authRoutes);
+
+app.use("/api/auth", authRoutes);
 // app.use("/api/products", productRoutes);
 
 // // Default Route
