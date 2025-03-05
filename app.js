@@ -3,31 +3,23 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 require("dotenv").config();
-const ConnectDatabase = require('./config/ConnectDatabase')
-
+const ConnectDatabase = require("./config/ConnectDatabase");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json())
+app.use(express.json());
 app.use(bodyParser.json());
+app.use(cookieParser());
 
-
-// connnect database 
-
+// connnect database
 ConnectDatabase();
 
- // Import Routes
+// Import Routes
 const authRoutes = require("./routes/authRoute");
 
-
 app.use("/api/auth", authRoutes);
-// app.use("/api/products", productRoutes);
 
-// // Default Route
-// app.get("/", (req, res) => {
-//     res.send("Welcome to the E-commerce API!");
-// });
-
-module.exports = app; // Export the app instance
+module.exports = app;
