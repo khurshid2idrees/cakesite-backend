@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 require("dotenv").config(); 
 
-export function DatabaseConnect() {
+async function DatabaseConnect() {
     try {
-        mongoose.connect(process.env.MONGO_URI, {
+        mongoose.connect(process.env.DATABASE_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
@@ -23,3 +23,5 @@ export function DatabaseConnect() {
         process.exit(1); 
     }
 }
+
+module.exports = DatabaseConnect;
