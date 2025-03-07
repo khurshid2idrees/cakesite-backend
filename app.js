@@ -19,7 +19,11 @@ ConnectDatabase();
 
 // Import Routes
 const authRoutes = require("./routes/authRoute");
+const categoryRoutes = require("./routes/categoryRoute");
+const subcategoryRoutes = require("./routes/subCategoryRoute");
 
 app.use("/api/auth", authRoutes);
+app.use("/api/category", categoryRoutes);
+app.use("/api/subcategory", subcategoryRoutes);
 
 module.exports = app;
