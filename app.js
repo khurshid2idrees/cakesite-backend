@@ -22,10 +22,12 @@ const authRoutes = require("./routes/authRoute");
 const categoryRoutes = require("./routes/categoryRoute");
 const subcategoryRoutes = require("./routes/subCategoryRoute");
 const productRoutes = require("./routes/productRoute");
+const wishlistRoutes = require("./routes/wishlistRoute");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/subcategory", subcategoryRoutes);
 app.use("/api/product", productRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 
 module.exports = app;
