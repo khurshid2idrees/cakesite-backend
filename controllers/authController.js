@@ -36,6 +36,10 @@ exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
@@ -61,13 +65,39 @@ exports.loginUser = async (req, res) => {
     res.status(200).json({
       status: "success",
       message: "Login successful",
-      token,
+      data: user,
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       status: "failed",
       message: "Server error",
       error: error.message,
     });
+  }
+};
+
+exports.getLoggedInUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select("-password");
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+    res.status(200).json({
+      status: "success",
+      message: "Verified User",
+      data: user,
+    })
+  } catch (error) {
+    res.status(500).json({ status: "failed", message: "Server error", error: error.message });
+  }
+}
+
+exports.logoutUser = (req, res) => {
+  try {
+    res.clearCookie("token");
+    res.status(200).json({ status: "success", message: "Logout successful" });
+  } catch (error) {
+    res.status(500).json({ status: "failed", message: "Server error", error: error.message });
   }
 };
