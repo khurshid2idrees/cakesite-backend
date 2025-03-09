@@ -23,11 +23,13 @@ const categoryRoutes = require("./routes/categoryRoute");
 const subcategoryRoutes = require("./routes/subCategoryRoute");
 const productRoutes = require("./routes/productRoute");
 const wishlistRoutes = require("./routes/wishlistRoute");
+const cartRoutes = require("./routes/cartRoute");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/subcategory", subcategoryRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/cart", cartRoutes);
 
 module.exports = app;
