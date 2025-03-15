@@ -41,12 +41,12 @@ exports.getCart = async (req, res) => {
 exports.deleteFromCart = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const productId = req.params.id;
+        const itemId = req.params.id;
         const cartList = await cartModal.findOne({ userId });
         if (!cartList) {
             return res.status(404).json({ status: "failed", message: "Cart not found" });
         }
-        cartList.items = cartList.items.filter((item) => item.productId.toString() !== productId);
+        cartList.items = cartList.items.filter((item) => item?._id?.toString() !== itemId);
         await cartList.save();
         res.status(200).json({ status: "success", message: "Product removed from cart successfully", data: cartList });
     } catch (error) {

@@ -8,8 +8,11 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 
-// Middleware
-app.use(cors());   
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+}));
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -24,6 +27,7 @@ const subcategoryRoutes = require("./routes/subCategoryRoute");
 const productRoutes = require("./routes/productRoute");
 const wishlistRoutes = require("./routes/wishlistRoute");
 const cartRoutes = require("./routes/cartRoute");
+const reviewRoutes = require("./routes/reviewRoute");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
@@ -31,5 +35,6 @@ app.use("/api/subcategory", subcategoryRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/review", reviewRoutes);
 
 module.exports = app;

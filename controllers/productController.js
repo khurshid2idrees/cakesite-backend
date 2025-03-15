@@ -1,4 +1,5 @@
 const ProductModel = require("../models/productModel");
+const reviewModel = require("../models/reviewModel");
 const { uploadImagesToCloudinary } = require("../utils/cloudinary");
 
 exports.createProduct = async (req, res) => {
@@ -132,7 +133,15 @@ exports.getProductById = async (req, res) => {
         if (!product) {
             return res.status(404).json({ success: false, message: "Product not found" });
         }
-        res.status(200).json({ success: true, message: "Product fetched successfully", data: product });
+        const reviews = await reviewModel.find({ "review.productId": product._id }).populate({ path: "userId", select: "firstName lastName" });
+        res.status(200).json({
+            success: true,
+            message: "Product fetched successfully",
+            data: {
+                ...product?._doc,
+                reviews
+            }
+        });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
