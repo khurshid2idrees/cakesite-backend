@@ -73,16 +73,46 @@ exports.getProducts = async (req, res) => {
     try {
         const { page, limit, minPrice, maxPrice, categoryId, subCategoryId } = req.query;
 
+        const ratings = await reviewModel.aggregate([
+            {
+                $group: {
+                    _id: "$review.productId",
+                    avgRating: { $avg: "$review.rating" },
+                    totalReviews: { $sum: 1 }
+                }
+            }
+        ]);
+
+        const ratingMap = {};
+        ratings.forEach(r => {
+            ratingMap[r._id.toString()] = {
+                avgRating: r.avgRating,
+                totalReviews: r.totalReviews
+            };
+        });
+
+
         // If no query params, return all products
         if (!page && !limit && !minPrice && !maxPrice && !categoryId && !subCategoryId) {
             const products = await ProductModel.find()
                 .populate({ path: "categoryId", select: "name" })
-                .populate({ path: "subCategoryId", select: "name" });
+                .populate({ path: "subCategoryId", select: "name" })
+                .lean();
+
+            const updatedProducts = products.map(product => {
+                const ratingInfo = ratingMap[product._id.toString()] || { avgRating: 0, totalReviews: 0 };
+                return {
+                    ...product,
+                    avgRating: Number(ratingInfo.avgRating.toFixed(1)),
+                    totalReviews: ratingInfo.totalReviews
+                };
+            });
+
 
             return res.status(200).json({
                 success: true,
                 message: "All products fetched successfully",
-                data: products
+                data: updatedProducts
             });
         }
 
@@ -104,7 +134,18 @@ exports.getProducts = async (req, res) => {
             .populate({ path: "categoryId", select: "name" })
             .populate({ path: "subCategoryId", select: "name" })
             .skip(skip)
-            .limit(perPage);
+            .limit(perPage)
+            .lean()
+
+        const updatedProducts = filteredProducts.map(product => {
+            const ratingInfo = ratingMap[product._id.toString()] || { avgRating: 0, totalReviews: 0 };
+            return {
+                ...product,
+                avgRating: Number(ratingInfo.avgRating.toFixed(1)),
+                totalReviews: ratingInfo.totalReviews
+            };
+        });
+
 
         const totalProducts = await ProductModel.countDocuments(filter);
         const totalPages = Math.ceil(totalProducts / perPage);
@@ -112,7 +153,7 @@ exports.getProducts = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "Filtered products fetched successfully",
-            data: filteredProducts,
+            data: updatedProducts,
             pagination: {
                 currentPage,
                 totalPages,

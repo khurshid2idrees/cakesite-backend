@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
 require("dotenv").config();
 const ConnectDatabase = require("./config/ConnectDatabase");
 const cookieParser = require("cookie-parser");
@@ -28,6 +27,8 @@ const productRoutes = require("./routes/productRoute");
 const wishlistRoutes = require("./routes/wishlistRoute");
 const cartRoutes = require("./routes/cartRoute");
 const reviewRoutes = require("./routes/reviewRoute");
+const addressRoutes = require("./routes/addressRoute");
+const orderRoutes = require("./routes/orderRoute")
 
 app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
@@ -36,5 +37,7 @@ app.use("/api/product", productRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/review", reviewRoutes);
+app.use("/api/address", addressRoutes);
+app.use("/api/order", orderRoutes);
 
 module.exports = app;
