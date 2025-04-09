@@ -1,6 +1,7 @@
 const ProductModel = require("../models/productModel");
 const reviewModel = require("../models/reviewModel");
 const { uploadImagesToCloudinary } = require("../utils/cloudinary");
+const mongoose = require("mongoose");
 
 exports.createProduct = async (req, res) => {
     try {
@@ -123,8 +124,13 @@ exports.getProducts = async (req, res) => {
             if (minPrice) filter["price"]["$gte"] = parseFloat(minPrice);
             if (maxPrice) filter["price"]["$lte"] = parseFloat(maxPrice);
         }
-        if (categoryId) filter["categoryId"] = categoryId;
-        if (subCategoryId) filter["subCategoryId"] = subCategoryId;
+        if (categoryId && mongoose.Types.ObjectId.isValid(categoryId)) {
+            filter["categoryId"] = new mongoose.Types.ObjectId(categoryId);
+        }
+        if (subCategoryId && mongoose.Types.ObjectId.isValid(subCategoryId)) {
+            filter["subCategoryId"] = new mongoose.Types.ObjectId(subCategoryId);
+        }
+
 
         const currentPage = parseInt(page) || 1;
         const perPage = parseInt(limit) || 10;
@@ -174,13 +180,15 @@ exports.getProductById = async (req, res) => {
         if (!product) {
             return res.status(404).json({ success: false, message: "Product not found" });
         }
+        const relatedProducts = await ProductModel.find({ subCategoryId: product.categoryId, _id: { $ne: product._id } }).limit(3);
         const reviews = await reviewModel.find({ "review.productId": product._id }).populate({ path: "userId", select: "firstName lastName" });
         res.status(200).json({
             success: true,
             message: "Product fetched successfully",
             data: {
                 ...product?._doc,
-                reviews
+                reviews,
+                relatedProducts
             }
         });
     } catch (error) {
