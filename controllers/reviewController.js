@@ -38,6 +38,10 @@ exports.addReview = async (req, res) => {
         });
 
         await review.save();
+        
+        const createReview = await reviewModel.findById(review?._id)
+            .populate({ path: "userId", select: "firstName lastName" })
+    
         res.status(200).json({
             status: "success",
             message: "Review added successfully",
