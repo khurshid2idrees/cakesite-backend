@@ -32,14 +32,14 @@ exports.createProduct = async (req, res) => {
         }
 
         // Validate weight values
-        const allowedWeights = ["250g", "500g", "1kg", "2kg", "3kg", "4kg"];
-        const invalidWeights = parsedWeight.filter((w) => !allowedWeights.includes(w));
-        if (invalidWeights.length > 0) {
-            return res.status(400).json({
-                success: false,
-                message: `Invalid weight values: ${invalidWeights.join(", ")}`,
-            });
-        }
+        // const allowedWeights = ["250g", "500g", "1kg", "2kg", "3kg", "4kg"];
+        // const invalidWeights = parsedWeight.filter((w) => !allowedWeights.includes(w));
+        // if (invalidWeights.length > 0) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: `Invalid weight values: ${invalidWeights.join(", ")}`,
+        //     });
+        // }
 
         // Upload images to Cloudinary
         let imageUrls = [];
