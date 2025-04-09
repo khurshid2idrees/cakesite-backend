@@ -62,7 +62,12 @@ exports.createProduct = async (req, res) => {
         });
 
         await product.save();
-        res.status(201).json({ success: true, product });
+        
+        const createdProduct = await await ProductModel.findById(product?._id)
+            .populate({ path: "categoryId", select: "name" })
+            .populate({ path: "subCategoryId", select: "name" })
+
+        res.status(201).json({ success: true, product: createdProduct });
     } catch (error) {
         console.error("Error creating product:", error);
         res.status(500).json({ success: false, message: "Internal Server Error" });
