@@ -75,8 +75,8 @@ exports.getOrdersAccordingToRole = async (req, res) => {
 
         const orders =
             role === "user"
-                ? await Order.find({ userId }).sort({ createdAt: -1 }).populate('items.productId')
-                : await Order.find().sort({ createdAt: -1 }).populate('items.productId')
+                ? await Order.find({ userId }).sort({ createdAt: -1 }).populate('items.productId').populate('userId')
+                : await Order.find().sort({ createdAt: -1 }).populate('items.productId').populate('userId')
 
         res.status(200).json({
             success: true,
