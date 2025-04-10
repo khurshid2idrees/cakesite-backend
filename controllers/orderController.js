@@ -1,4 +1,5 @@
 const Order = require("../models/orderModel");
+const cartModal = require("../models/cartModel");
 
 exports.createOrder = async (req, res) => {
     try {
@@ -14,6 +15,13 @@ exports.createOrder = async (req, res) => {
         });
 
         await order.save();
+
+        await cartModal.findOneAndUpdate(
+            { userId },
+            { $set: { items: [] } },
+            { new: true }
+        );
+
         res.status(201).json({ success: true, message: 'Order placed successfully', data: order });
 
     } catch (error) {
