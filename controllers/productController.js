@@ -232,12 +232,67 @@ exports.getProductById = async (req, res) => {
 exports.editProduct = async (req, res) => {
   try {
     const { productId } = req.params;
-    const updates = req.body;
+    const {
+      price,
+      weight,
+      discountPercent,
+      name,
+      description,
+      categoryId,
+      subCategoryId,
+    } = req.body;
 
-    const updatedProduct = await ProductModel.findByIdAndUpdate(productId, updates, {
-      new: true,
-      runValidators: true,
-    });
+    // Parse price
+    let parsedPrice;
+    try {
+      parsedPrice = typeof price === "string" ? JSON.parse(price) : price;
+    } catch (err) {
+      return res
+        .status(400)
+        .json({ status: "failed", message: "Invalid price format" });
+    }
+
+    // Parse weight
+    let parsedWeight;
+    if (typeof weight === "string") {
+      try {
+        parsedWeight = JSON.parse(weight);
+      } catch (err) {
+        parsedWeight = weight.split(",").map((w) => w.trim());
+      }
+    } else {
+      parsedWeight = weight;
+    }
+
+    // Upload new images if provided
+    let imageUrls = [];
+    if (req.files && req.files.length > 0) {
+      imageUrls = await uploadImagesToCloudinary(req.files);
+    }
+
+    // Build update object
+    const updateFields = {
+      price: new Map(Object.entries(parsedPrice)),
+      weight: parsedWeight,
+      discountPercent: discountPercent || 0,
+      name,
+      description,
+      categoryId,
+      subCategoryId,
+    };
+
+    if (imageUrls.length > 0) {
+      updateFields.images = imageUrls;
+    }
+
+    const updatedProduct = await ProductModel.findByIdAndUpdate(
+      productId,
+      updateFields,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     if (!updatedProduct) {
       return res
@@ -251,6 +306,7 @@ exports.editProduct = async (req, res) => {
       data: updatedProduct,
     });
   } catch (error) {
+    console.error("Error editing product:", error);
     res.status(500).json({ status: "failed", message: error.message });
   }
 };
