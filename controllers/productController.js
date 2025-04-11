@@ -242,6 +242,14 @@ exports.editProduct = async (req, res) => {
       subCategoryId,
     } = req.body;
 
+    // Fetch existing product
+    const existingProduct = await ProductModel.findById(productId);
+    if (!existingProduct) {
+      return res
+        .status(404)
+        .json({ status: "failed", message: "Product not found" });
+    }
+
     // Parse price
     let parsedPrice;
     try {
@@ -264,41 +272,32 @@ exports.editProduct = async (req, res) => {
       parsedWeight = weight;
     }
 
-    // Upload new images if provided
-    let imageUrls = [];
+    // Upload new images if any
+    let newImageUrls = [];
     if (req.files && req.files.length > 0) {
-      imageUrls = await uploadImagesToCloudinary(req.files);
+      newImageUrls = await uploadImagesToCloudinary(req.files);
     }
+
+    // Merge old + new images
+    const updatedImages = [...(existingProduct.images || []), ...newImageUrls];
 
     // Build update object
     const updateFields = {
-      price: new Map(Object.entries(parsedPrice)),
-      weight: parsedWeight,
-      discountPercent: discountPercent || 0,
       name,
       description,
       categoryId,
       subCategoryId,
+      discountPercent: discountPercent || 0,
+      price: new Map(Object.entries(parsedPrice)),
+      weight: parsedWeight,
+      images: updatedImages,
     };
-
-    if (imageUrls.length > 0) {
-      updateFields.images = imageUrls;
-    }
 
     const updatedProduct = await ProductModel.findByIdAndUpdate(
       productId,
       updateFields,
-      {
-        new: true,
-        runValidators: true,
-      }
+      { new: true, runValidators: true }
     );
-
-    if (!updatedProduct) {
-      return res
-        .status(404)
-        .json({ status: "failed", message: "Product not found" });
-    }
 
     res.status(200).json({
       status: "success",
