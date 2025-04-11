@@ -7,6 +7,6 @@ const { createProduct, getProductById, getProducts, editProduct } = require("../
 router.post("/create", upload.array("images", 5), createProduct);
 router.get("/", getProducts)
 router.get("/:id", getProductById)
-router.put("/", upload.array("images", 5), editProduct)
+router.put("/:productId", upload.array("images", 5), editProduct)
 
 module.exports = router;
