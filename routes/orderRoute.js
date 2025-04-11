@@ -7,6 +7,6 @@ router.use(verifyToken);
 
 router.get('/', orderController.getOrdersAccordingToRole);
 router.post('/', orderController.createOrder);
-router.put('/', orderController.updateStatus);
+router.put('/:orderId', orderController.updateStatus);
 
 module.exports = router;
