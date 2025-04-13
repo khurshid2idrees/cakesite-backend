@@ -18,7 +18,10 @@ exports.addToCart = async (req, res) => {
             cartList.items.push({ productId, price, cakeMessage });
         }
         await cartList.save();
-        res.status(200).json({ status: "success", message: "Product added to cart successfully", data: cartList });
+
+        const populatedCart = await cartModal.findOne({ userId }).populate('items.productId');
+
+        res.status(200).json({ status: "success", message: "Product added to cart successfully", data: populatedCart });
 
     } catch (error) {
         res.status(500).json({ status: "failed", message: error.message });
@@ -48,7 +51,10 @@ exports.deleteFromCart = async (req, res) => {
         }
         cartList.items = cartList.items.filter((item) => item?._id?.toString() !== itemId);
         await cartList.save();
-        res.status(200).json({ status: "success", message: "Product removed from cart successfully", data: cartList });
+        
+        const populatedCart = await cartModal.findOne({ userId }).populate('items.productId');
+        
+        res.status(200).json({ status: "success", message: "Product removed from cart successfully", data: populatedCart });
     } catch (error) {
         res.status(500).json({ status: "failed", message: error.message });
     }

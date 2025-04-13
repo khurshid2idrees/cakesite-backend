@@ -1,4 +1,5 @@
 const Order = require("../models/orderModel");
+const cartModal = require("../models/cartModel");
 
 exports.createOrder = async (req, res) => {
     try {
@@ -14,6 +15,13 @@ exports.createOrder = async (req, res) => {
         });
 
         await order.save();
+
+        await cartModal.findOneAndUpdate(
+            { userId },
+            { $set: { items: [] } },
+            { new: true }
+        );
+
         res.status(201).json({ success: true, message: 'Order placed successfully', data: order });
 
     } catch (error) {
@@ -67,8 +75,8 @@ exports.getOrdersAccordingToRole = async (req, res) => {
 
         const orders =
             role === "user"
-                ? await Order.find({ userId }).sort({ createdAt: -1 })
-                : await Order.find().sort({ createdAt: -1 });
+                ? await Order.find({ userId }).sort({ createdAt: -1 }).populate('items.productId').populate('userId').populate('shippingAddressId')
+                : await Order.find().sort({ createdAt: -1 }).populate('items.productId').populate('userId').populate('shippingAddressId')
 
         res.status(200).json({
             success: true,

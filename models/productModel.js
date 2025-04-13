@@ -33,7 +33,6 @@ const productSchema = new mongoose.Schema(
     },
     weight: {
       type: [String], // Array of strings
-      enum: ["250g", "500g", "1kg", "2kg", "3kg", "4kg"], // Allowed weight options
       required: [true, "At least one weight option is required"],
     },
     discountPercent: {
