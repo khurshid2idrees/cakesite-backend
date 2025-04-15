@@ -12,6 +12,7 @@ exports.createProduct = async (req, res) => {
       description,
       categoryId,
       subCategoryId,
+      flavourId
     } = req.body;
 
     // Check if all required fields are present
@@ -21,7 +22,8 @@ exports.createProduct = async (req, res) => {
       !name ||
       !description ||
       !categoryId ||
-      !subCategoryId
+      !subCategoryId ||
+      !flavourId
     ) {
       return res
         .status(400)
@@ -80,13 +82,15 @@ exports.createProduct = async (req, res) => {
       description,
       categoryId,
       subCategoryId,
+      flavourId
     });
 
     await product.save();
 
     const createdProduct = await await ProductModel.findById(product?._id)
       .populate({ path: "categoryId", select: "name" })
-      .populate({ path: "subCategoryId", select: "name" });
+      .populate({ path: "subCategoryId", select: "name" })
+      .populate({ path: "flavourId", select: "name" });
 
     res.status(201).json({ success: true, product: createdProduct });
   } catch (error) {
@@ -97,7 +101,7 @@ exports.createProduct = async (req, res) => {
 
 exports.getProducts = async (req, res) => {
   try {
-    const { page, limit, minPrice, maxPrice, categoryId, subCategoryId } =
+    const { page, limit, minPrice, maxPrice, categoryId, subCategoryId, flavourId } =
       req.query;
 
     const ratings = await reviewModel.aggregate([
@@ -125,11 +129,13 @@ exports.getProducts = async (req, res) => {
       !minPrice &&
       !maxPrice &&
       !categoryId &&
-      !subCategoryId
+      !subCategoryId &&
+      !flavourId
     ) {
       const products = await ProductModel.find()
         .populate({ path: "categoryId", select: "name" })
         .populate({ path: "subCategoryId", select: "name" })
+        .populate({ path: "flavourId", select: "name" })
         .lean();
 
       const updatedProducts = products.map((product) => {
@@ -160,6 +166,7 @@ exports.getProducts = async (req, res) => {
     }
     if (categoryId) filter["categoryId"] = categoryId;
     if (subCategoryId) filter["subCategoryId"] = subCategoryId;
+    if (flavourId) filter["flavourId"] = flavourId;
 
     const currentPage = parseInt(page) || 1;
     const perPage = parseInt(limit) || 10;
@@ -168,6 +175,7 @@ exports.getProducts = async (req, res) => {
     const filteredProducts = await ProductModel.find(filter)
       .populate({ path: "categoryId", select: "name" })
       .populate({ path: "subCategoryId", select: "name" })
+      .populate({ path: "flavourId", select: "name" })
       .skip(skip)
       .limit(perPage)
       .lean();
@@ -207,7 +215,8 @@ exports.getProductById = async (req, res) => {
   try {
     const product = await ProductModel.findById(req.params.id)
       .populate({ path: "categoryId", select: "name" })
-      .populate({ path: "subCategoryId", select: "name" });
+      .populate({ path: "subCategoryId", select: "name" })
+      .populate({ path: "flavourId", select: "name" });
     if (!product) {
       return res
         .status(404)
@@ -240,6 +249,7 @@ exports.editProduct = async (req, res) => {
       description,
       categoryId,
       subCategoryId,
+      flavourId
     } = req.body;
 
     // Fetch existing product
@@ -287,6 +297,7 @@ exports.editProduct = async (req, res) => {
       description,
       categoryId,
       subCategoryId,
+      flavourId,
       discountPercent: discountPercent || 0,
       price: new Map(Object.entries(parsedPrice)),
       weight: parsedWeight,

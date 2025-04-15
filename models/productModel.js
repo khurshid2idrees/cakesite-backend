@@ -26,6 +26,11 @@ const productSchema = new mongoose.Schema(
       ref: "Subcategory",
       required: [true, "Subcategory ID is required"],
     },
+    flavourId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Flavour",
+      required: [true, "Flavour ID is required"],
+    },
     price: {
       type: Map, // Object storing prices for different weights
       of: Number, // The value (price) should be a number

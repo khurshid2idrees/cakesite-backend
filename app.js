@@ -31,6 +31,7 @@ const addressRoutes = require("./routes/addressRoute");
 const orderRoutes = require("./routes/orderRoute")
 const dashboardRoutes = require("./routes/dashboardRoute");
 const contactusRoutes = require("./routes/contactusRoute");
+const flavourRoutes = require("./routes/flavourRoute");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
@@ -43,5 +44,6 @@ app.use("/api/address", addressRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/contactus", contactusRoutes);
+app.use("/api/flavour", flavourRoutes);
 
 module.exports = app;

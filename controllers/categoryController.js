@@ -1,38 +1,40 @@
 const CategoryModel = require("../models/categoryModel");
+const { uploadImagesToCloudinary } = require("../utils/cloudinary");
 
 // Create Category
 exports.createCategory = async (req, res) => {
   try {
     const { name } = req.body;
-
     if (!name) {
+      return res.status(400).json({
+        status: "failed",
+        message: "Category name is required",
+        error: null,
+      });
+    }
+    let imageUrls = [];
+    if (req.files && req.files.length > 0) {
+      imageUrls = await uploadImagesToCloudinary(req.files);
+    } else {
       return res
         .status(400)
-        .json({
-          status: "failed",
-          message: "Category name is required",
-          error: null,
-        });
+        .json({ success: false, message: "At least one image is required" });
     }
 
-    const category = new CategoryModel({ name });
+    const category = new CategoryModel({ name, image: imageUrls });
     await category.save();
 
-    res
-      .status(201)
-      .json({
-        status: "success",
-        message: "Category created successfully",
-        data: category,
-      });
+    res.status(201).json({
+      status: "success",
+      message: "Category created successfully",
+      data: category,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        status: "failed",
-        message: "Server error",
-        error: error.message,
-      });
+    res.status(500).json({
+      status: "failed",
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
 
@@ -40,21 +42,17 @@ exports.createCategory = async (req, res) => {
 exports.getCategories = async (req, res) => {
   try {
     const categories = await CategoryModel.find().populate("subcategories");
-    res
-      .status(200)
-      .json({
-        status: "success",
-        message: "Categories fetched successfully",
-        data: categories,
-      });
+    res.status(200).json({
+      status: "success",
+      message: "Categories fetched successfully",
+      data: categories,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        status: "failed",
-        message: "Server error",
-        error: error.message,
-      });
+    res.status(500).json({
+      status: "failed",
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
 
@@ -64,11 +62,20 @@ exports.updateCategory = async (req, res) => {
     const { name } = req.body;
     const { id } = req.params;
 
-    const category = await CategoryModel.findByIdAndUpdate(
-      id,
-      { name },
-      { new: true }
-    );
+    let updateData = {};
+
+    if (name) {
+      updateData.name = name;
+    }
+
+    if (req.files && req.files.length > 0) {
+      const imageUrls = await uploadImagesToCloudinary(req.files);
+      updateData.image = imageUrls;
+    }
+
+    const category = await CategoryModel.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
 
     if (!category) {
       return res
@@ -76,21 +83,17 @@ exports.updateCategory = async (req, res) => {
         .json({ status: "failed", message: "Category not found", error: null });
     }
 
-    res
-      .status(200)
-      .json({
-        status: "success",
-        message: "Category updated successfully",
-        data: category,
-      });
+    res.status(200).json({
+      status: "success",
+      message: "Category updated successfully",
+      data: category,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        status: "failed",
-        message: "Server error",
-        error: error.message,
-      });
+    res.status(500).json({
+      status: "failed",
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
 
@@ -107,20 +110,16 @@ exports.deleteCategory = async (req, res) => {
         .json({ status: "failed", message: "Category not found", error: null });
     }
 
-    res
-      .status(200)
-      .json({
-        status: "success",
-        message: "Category deleted successfully",
-        data: null,
-      });
+    res.status(200).json({
+      status: "success",
+      message: "Category deleted successfully",
+      data: null,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        status: "failed",
-        message: "Server error",
-        error: error.message,
-      });
+    res.status(500).json({
+      status: "failed",
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
