@@ -22,7 +22,6 @@ exports.createProduct = async (req, res) => {
       !name ||
       !description ||
       !categoryId ||
-      !subCategoryId ||
       !flavourId
     ) {
       return res

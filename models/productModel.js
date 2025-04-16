@@ -24,7 +24,7 @@ const productSchema = new mongoose.Schema(
     subCategoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Subcategory",
-      required: [true, "Subcategory ID is required"],
+      required: false,
     },
     flavourId: {
       type: mongoose.Schema.Types.ObjectId,
