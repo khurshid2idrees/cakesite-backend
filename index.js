@@ -3,7 +3,7 @@ const app = require("./app");
 require("dotenv").config();
 
 // Define Port
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.POR || 5001;
 
 // Start the Express Server
 app.listen(PORT, () => {
