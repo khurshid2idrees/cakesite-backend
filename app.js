@@ -7,30 +7,18 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:3001",
-  "https://bakeryfy.netlify.app",
-];
+
+app.use(express.json({ limit: "25mb" }));
+app.use(bodyParser.json());
+app.use(cookieParser());
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
+    origin: ["https://bakeryfy.netlify.app", "http://localhost:3000"],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
   })
 );
-
-app.use(express.json({ limit: '25mb' }));
-app.use(express.urlencoded({ limit: '25mb', extended: true }));
-app.use(bodyParser.json());
-app.use(cookieParser());
 
 // connnect database`
 ConnectDatabase();
