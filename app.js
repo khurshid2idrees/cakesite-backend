@@ -7,11 +7,26 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 
-app.use(cors({
-    origin: "http://localhost:3000",
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "https://bakeryfy.netlify.app",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-}));
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  })
+);
+
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -28,7 +43,7 @@ const wishlistRoutes = require("./routes/wishlistRoute");
 const cartRoutes = require("./routes/cartRoute");
 const reviewRoutes = require("./routes/reviewRoute");
 const addressRoutes = require("./routes/addressRoute");
-const orderRoutes = require("./routes/orderRoute")
+const orderRoutes = require("./routes/orderRoute");
 const dashboardRoutes = require("./routes/dashboardRoute");
 const contactusRoutes = require("./routes/contactusRoute");
 const flavourRoutes = require("./routes/flavourRoute");
