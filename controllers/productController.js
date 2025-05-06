@@ -39,6 +39,12 @@ exports.createProduct = async (req, res) => {
         .json({ success: false, message: "Invalid price format" });
     }
 
+    const sanitizedPrice = {};
+    Object.entries(parsedPrice).forEach(([key, value]) => {
+      const newKey = key.replace(/\./g, "_");
+      sanitizedPrice[newKey] = value;
+    });
+
     // Parse weight to ensure it's an array
     let parsedWeight;
     if (typeof weight === "string") {
@@ -74,7 +80,7 @@ exports.createProduct = async (req, res) => {
     // Create and save product
     const product = new ProductModel({
       images: imageUrls,
-      price: new Map(Object.entries(parsedPrice)), // Convert price object to Map
+      price: new Map(Object.entries(sanitizedPrice)), // Convert price object to Map
       weight: parsedWeight,
       discountPercent: discountPercent || 0, // Default to 0 if not provided
       name,
@@ -269,6 +275,12 @@ exports.editProduct = async (req, res) => {
         .json({ status: "failed", message: "Invalid price format" });
     }
 
+    const sanitizedPrice = {};
+    Object.entries(parsedPrice).forEach(([key, value]) => {
+      const newKey = key.replace(/\./g, "_");
+      sanitizedPrice[newKey] = value;
+    });
+
     // Parse weight
     let parsedWeight;
     if (typeof weight === "string") {
@@ -298,7 +310,7 @@ exports.editProduct = async (req, res) => {
       subCategoryId,
       flavourId,
       discountPercent: discountPercent || 0,
-      price: new Map(Object.entries(parsedPrice)),
+      price: new Map(Object.entries(sanitizedPrice)),
       weight: parsedWeight,
       images: updatedImages,
     };
